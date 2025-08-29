@@ -1,97 +1,211 @@
- <!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex Rates</title>
-    <style>
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin: 20px auto;
-            text-align: left;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        caption {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forex Rates</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111827; /* slate-900 */
+      --muted: #6b7280; /* gray-500 */
+      --th-bg: #f4f4f4;
+      --table-border: #e5e7eb; /* gray-200 */
+      --row-hover: #f9fafb; /* gray-50 */
+      --card-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+    }
+    html[data-theme="dark"] {
+      --bg: #0b1020; /* deep navy */
+      --text: #e5e7eb; /* gray-200 */
+      --muted: #9ca3af; /* gray-400 */
+      --th-bg: #111827; /* slate-900 */
+      --table-border: #1f2937; /* gray-800 */
+      --row-hover: #0f172a; /* slate-900/950 */
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
+      transition: background .25s ease, color .25s ease;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 12px auto 4px;
+      max-width: 1000px;
+      padding: 0 20px;
+    }
+
+    #date-heading {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Toggle button (icon-only) */
+    .icon-button {
+      appearance: none;
+      border: 1px solid var(--table-border);
+      background: transparent;
+      border-radius: 9999px;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .15s ease, background .25s ease, border-color .25s ease;
+      box-shadow: var(--card-shadow);
+    }
+    .icon-button:hover { transform: scale(1.04); }
+    .icon-button:active { transform: scale(0.98); }
+
+    .icon { width: 22px; height: 22px; display: none; }
+    /* Show moon in light theme, sun in dark theme */
+    html[data-theme="light"] .icon-moon { display: block; }
+    html[data-theme="dark"] .icon-sun { display: block; }
+
+    table {
+      width: 80%;
+      border-collapse: collapse;
+      margin: 20px auto;
+      text-align: left;
+      background: transparent;
+      box-shadow: var(--card-shadow);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid var(--table-border);
+      padding: 12px 14px;
+      transition: background .25s ease, color .25s ease, border-color .25s ease;
+    }
+    th { background-color: var(--th-bg); }
+    tr:hover td { background: var(--row-hover); }
+
+    caption {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* Respect system preference on first load if no saved preference */
+    @media (prefers-color-scheme: dark) {
+      html[data-theme="system"] { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --th-bg:#111827; --table-border:#1f2937; --row-hover:#0f172a; }
+    }
+  </style>
 </head>
 <body>
+  <header>
     <div id="date-heading"></div>
-    <table>
-        <caption>Forex Rates</caption>
-        <thead>
-            <tr>
-                <th>Currency</th>
-                <th>Unit</th>
-                <th>Buy Rate</th>
-                <th>Sell Rate</th>
-            </tr>
-        </thead>
-        <tbody id="forex-rates">
-        </tbody>
-    </table>
+    <button id="theme-toggle" class="icon-button" aria-label="Toggle dark mode" title="Toggle theme">
+      <!-- Sun icon (shown in dark mode) -->
+      <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+      <!-- Moon icon (shown in light mode) -->
+      <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </header>
 
-    <script>
-        // Function to get the current or tomorrow's date in YYYY-MM-DD format
-        function getFormattedDate(offset = 0) {
-            const date = new Date();
-            date.setDate(date.getDate() + offset); // Add offset for tomorrow (1) or keep today (0)
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-            const day = String(date.getDate()).padStart(2, '0');
-            return { formatted: `${year}-${month}-${day}`, display: `${day}-${month}-${year}` };
+  <div class="container">
+    <table>
+      <caption>Forex Rates</caption>
+      <thead>
+        <tr>
+          <th>Currency</th>
+          <th>Unit</th>
+          <th>Buy Rate</th>
+          <th>Sell Rate</th>
+        </tr>
+      </thead>
+      <tbody id="forex-rates"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // --- Theme setup ---
+    (function initTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light' || saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else {
+        // Use system preference on first load
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      }
+    })();
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+
+    // --- Date utilities ---
+    function getFormattedDate(offset = 0) {
+      const date = new Date();
+      date.setHours(12,0,0,0); // reduce TZ edge cases
+      date.setDate(date.getDate() + offset);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return { formatted: `${year}-${month}-${day}`, display: `${day}-${month}-${year}` };
+    }
+
+    const { formatted: currentDate, display: displayDate } = getFormattedDate(0);
+    document.getElementById('date-heading').innerText = `Exchange Rates for ${displayDate}`;
+
+    const apiURL = `https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=10&from=${currentDate}&to=${currentDate}`;
+
+    fetch(apiURL)
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        const payload = data?.data?.payload;
+        const rates = Array.isArray(payload) && payload[0]?.rates ? payload[0].rates : [];
+        const tableBody = document.getElementById('forex-rates');
+
+        if (!rates.length) {
+          tableBody.innerHTML = `<tr><td colspan="4">No data available for ${displayDate}.</td></tr>`;
+          return;
         }
 
-        // Get today's date
-        const { formatted: currentDate, display: displayDate } = getFormattedDate(0); // Today's date
-
-        // Update the heading with the current date
-        document.getElementById('date-heading').innerText = `Exchange Rates for ${displayDate}`;
-        
-        // API URL with dynamic date
-        const apiURL = `https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=10&from=${currentDate}&to=${currentDate}`;
-
-        // Fetch data from API and populate the table
-        fetch(apiURL)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Extract rates from the API response
-                const rates = data.data.payload[0].rates;
-
-                // Select the table body element
-                const tableBody = document.getElementById('forex-rates');
-
-                // Loop through rates and add rows to the table
-                rates.forEach(rate => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${rate.currency.name} (${rate.currency.iso3})</td>
-                        <td>${rate.currency.unit}</td>
-                        <td>${rate.buy}</td>
-                        <td>${rate.sell}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            })
-            .catch(error => {
-                console.error("Error fetching data:", error);
-                const tableBody = document.getElementById('forex-rates');
-                tableBody.innerHTML = `<tr><td colspan="4">Failed to load data. Please try again later.</td></tr>`;
-            });
-    </script>
+        rates.forEach(rate => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${rate.currency.name} (${rate.currency.iso3})</td>
+            <td>${rate.currency.unit}</td>
+            <td>${rate.buy}</td>
+            <td>${rate.sell}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        const tableBody = document.getElementById('forex-rates');
+        tableBody.innerHTML = `<tr><td colspan="4">Failed to load data. Please try again later.</td></tr>`;
+      });
+  </script>
 </body>
 </html>
