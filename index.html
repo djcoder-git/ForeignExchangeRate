@@ -1,136 +1,114 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Forex Rates</title>
+
+  <!-- Initialize theme as early as possible to avoid flash and ensure icons render correctly -->
+  <script>
+    (function(){
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', saved);
+        } else if (window.matchMedia) {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+
   <style>
     :root {
       --bg: #ffffff;
-      --text: #111827; /* slate-900 */
-      --muted: #6b7280; /* gray-500 */
+      --text: #111827;
+      --muted: #6b7280;
       --th-bg: #f4f4f4;
-      --table-border: #e5e7eb; /* gray-200 */
-      --row-hover: #f9fafb; /* gray-50 */
-      --card-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+      --table-border: #e5e7eb;
+      --row-hover: #f9fafb;
+
+      /* Icon colors (defaults) */
+      --icon-sun: #f59e0b;   /* amber */
+      --icon-moon: #2563eb;  /* blue-600 */
     }
-    html[data-theme="dark"] {
-      --bg: #0b1020; /* deep navy */
-      --text: #e5e7eb; /* gray-200 */
-      --muted: #9ca3af; /* gray-400 */
-      --th-bg: #111827; /* slate-900 */
-      --table-border: #1f2937; /* gray-800 */
-      --row-hover: #0f172a; /* slate-900/950 */
+
+    html[data-theme='dark'] {
+      --bg: #0b1020;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --th-bg: #111827;
+      --table-border: #1f2937;
+      --row-hover: #0f172a;
+
+      /* ensure icon colors remain bright on dark bg */
+      --icon-sun: #facc15;
+      --icon-moon: #60a5fa;
     }
 
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
+    html,body { height:100%; margin:0; }
     body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
       background: var(--bg);
       color: var(--text);
-      transition: background .25s ease, color .25s ease;
+      transition: background .20s ease, color .20s ease;
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+    header { display:flex; justify-content:space-between; align-items:center; max-width:1000px; margin:12px auto; padding:0 20px; }
+    #date-heading { font-size:1.15rem; font-weight:600; }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 12px auto 4px;
-      max-width: 1000px;
-      padding: 0 20px;
-    }
-
-    #date-heading {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    /* Toggle button (icon-only) */
+    /* Icon-only button */
     .icon-button {
-      appearance: none;
-      border: 1px solid var(--table-border);
-      background: transparent;
-      border-radius: 9999px;
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: transform .15s ease, background .25s ease, border-color .25s ease;
-      box-shadow: var(--card-shadow);
-    }
-    .icon-button:hover { transform: scale(1.04); }
-    .icon-button:active { transform: scale(0.98); }
-
-    .icon { width: 22px; height: 22px; display: none; }
-    /* Show moon in light theme, sun in dark theme */
-    html[data-theme="light"] .icon-moon { display: block; }
-    html[data-theme="dark"] .icon-sun { display: block; }
-
-    <!-- Sun icon (shown in dark mode) -->
-<svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: #facc15;">
-<circle cx="12" cy="12" r="4"></circle>
-<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-</svg>
-<!-- Moon icon (shown in light mode) -->
-<svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: #60a5fa;">
-<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-</svg>
-
-    table {
-      width: 80%;
-      border-collapse: collapse;
-      margin: 20px auto;
-      text-align: left;
-      background: transparent;
-      box-shadow: var(--card-shadow);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid var(--table-border);
-      padding: 12px 14px;
-      transition: background .25s ease, color .25s ease, border-color .25s ease;
-    }
-    th { background-color: var(--th-bg); }
-    tr:hover td { background: var(--row-hover); }
-
-    caption {
-      font-size: 1.5em;
-      margin-bottom: 10px;
-      color: var(--text);
-      font-weight: 700;
+      width:40px; height:40px; border-radius:9999px; display:grid; place-items:center; cursor:pointer; border:1px solid var(--table-border); background:transparent; padding:6px;
     }
 
-    /* Respect system preference on first load if no saved preference */
-    @media (prefers-color-scheme: dark) {
-      html[data-theme="system"] { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --th-bg:#111827; --table-border:#1f2937; --row-hover:#0f172a; }
-    }
+    /* SVG/icon rules */
+    .icon { width:22px; height:22px; display:none; }
+    .icon svg { width:100%; height:100%; display:block; }
+
+    /* use currentColor for stroke/fill so color property controls appearance */
+    .icon svg [stroke], .icon svg [fill] { stroke:currentColor; fill:none; }
+
+    /* show appropriate icon for current theme; ensure color variable is applied */
+    html[data-theme='light'] .icon-moon { display:block; color:var(--icon-moon); }
+    html[data-theme='dark']  .icon-sun  { display:block; color:var(--icon-sun); }
+
+    /* Table styling */
+    .container { max-width:1000px; margin:0 auto; padding:0 20px 40px; }
+    table { width:80%; margin:20px auto; border-collapse:collapse; text-align:left; border-radius:12px; overflow:hidden; }
+    th, td { padding:12px 14px; border:1px solid var(--table-border); }
+    th { background:var(--th-bg); }
+    tr:hover td { background:var(--row-hover); }
+    caption { font-size:1.5rem; margin-bottom:10px; font-weight:700; }
+
+    /* small responsive tweak */
+    @media (max-width:820px) { table { width:100%; } }
   </style>
 </head>
 <body>
   <header>
-    <div id="date-heading"></div>
-    <button id="theme-toggle" class="icon-button" aria-label="Toggle dark mode" title="Toggle theme">
+    <div id="date-heading">Exchange Rates</div>
+
+    <!-- Icon-only toggle button (no text) -->
+    <button id="theme-toggle" class="icon-button" aria-label="Toggle theme" title="Toggle theme">
       <!-- Sun icon (shown in dark mode) -->
-      <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="4"></circle>
-        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-      </svg>
+      <span class="icon icon-sun" aria-hidden="true">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+        </svg>
+      </span>
+
       <!-- Moon icon (shown in light mode) -->
-      <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
+      <span class="icon icon-moon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </span>
     </button>
   </header>
 
@@ -150,73 +128,60 @@
   </div>
 
   <script>
-    // --- Theme setup ---
-    (function initTheme() {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'light' || saved === 'dark') {
-        document.documentElement.setAttribute('data-theme', saved);
-      } else {
-        // Use system preference on first load
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-      }
-    })();
-
-    document.getElementById('theme-toggle').addEventListener('click', () => {
+    // Toggle handler
+    const toggle = document.getElementById('theme-toggle');
+    toggle.addEventListener('click', () => {
       const html = document.documentElement;
       const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
+      try { localStorage.setItem('theme', next); } catch(e){}
     });
 
-    // --- Date utilities ---
+    // Date utilities
     function getFormattedDate(offset = 0) {
-      const date = new Date();
-      date.setHours(12,0,0,0); // reduce TZ edge cases
-      date.setDate(date.getDate() + offset);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return { formatted: `${year}-${month}-${day}`, display: `${day}-${month}-${year}` };
+      const d = new Date();
+      d.setHours(12,0,0,0);
+      d.setDate(d.getDate() + offset);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return { formatted: `${y}-${m}-${day}`, display: `${day}-${m}-${y}` };
     }
 
     const { formatted: currentDate, display: displayDate } = getFormattedDate(0);
     document.getElementById('date-heading').innerText = `Exchange Rates for ${displayDate}`;
 
+    // API fetch (NRB) and table population
     const apiURL = `https://www.nrb.org.np/api/forex/v1/rates?page=1&per_page=10&from=${currentDate}&to=${currentDate}`;
 
     fetch(apiURL)
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
       })
       .then(data => {
         const payload = data?.data?.payload;
         const rates = Array.isArray(payload) && payload[0]?.rates ? payload[0].rates : [];
-        const tableBody = document.getElementById('forex-rates');
-
+        const tbody = document.getElementById('forex-rates');
         if (!rates.length) {
-          tableBody.innerHTML = `<tr><td colspan="4">No data available for ${displayDate}.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="4">No data available for ${displayDate}.</td></tr>`;
           return;
         }
-
         rates.forEach(rate => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
             <td>${rate.currency.name} (${rate.currency.iso3})</td>
             <td>${rate.currency.unit}</td>
             <td>${rate.buy}</td>
             <td>${rate.sell}</td>
           `;
-          tableBody.appendChild(row);
+          tbody.appendChild(tr);
         });
       })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        const tableBody = document.getElementById('forex-rates');
-        tableBody.innerHTML = `<tr><td colspan="4">Failed to load data. Please try again later.</td></tr>`;
+      .catch(err => {
+        console.error('Error fetching data:', err);
+        document.getElementById('forex-rates').innerHTML = `<tr><td colspan="4">Failed to load data. Please try again later.</td></tr>`;
       });
   </script>
 </body>
 </html>
-
